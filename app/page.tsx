@@ -58,19 +58,43 @@ export default function Home() {
     }
   }, [])
 
+  const changeGamePhase = async (newPhase: GamePhase) => {
+    try {
+      await fetch('/api/phase-change', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phase: newPhase }),
+      })
+      setGamePhase(newPhase)
+    } catch (err) {
+      console.error('Failed to change game phase:', err)
+      setError('Failed to change game phase. Please try again.')
+    }
+  }
+
   const renderCurrentPhase = () => {
     switch (gamePhase) {
       case 'waiting':
-        return <WaitingRoom players={players} onStart={() => setGamePhase('submitting')} />
+        return <WaitingRoom players={players} onStart={() => changeGamePhase('submitting')} />
       case 'submitting':
         return (
           <>
             <AddGameTitle onAddGame={(game) => setGames([...games, game])} />
             <GameList games={games} />
+            <button onClick={() => changeGamePhase('vetoing')} className="pixel-btn mt-4">
+              Move to Veto Round
+            </button>
           </>
         )
       case 'vetoing':
-        return <VetoRound games={games} onVeto={(game) => setGames(games.filter((g) => g !== game))} />
+        return (
+          <>
+            <VetoRound games={games} onVeto={(game) => setGames(games.filter((g) => g !== game))} />
+            <button onClick={() => changeGamePhase('voting')} className="pixel-btn mt-4">
+              Move to Final Voting
+            </button>
+          </>
+        )
       case 'voting':
         return <FinalVoting games={games} />
       default:
