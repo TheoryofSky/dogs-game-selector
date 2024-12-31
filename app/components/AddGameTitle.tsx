@@ -21,15 +21,15 @@ export default function AddGameTitle({ onAddGame }: AddGameTitleProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-2">
       <input
         type="text"
         value={gameTitle}
         onChange={(e) => setGameTitle(e.target.value)}
         placeholder="Enter game title"
-        className="pixel-input w-full"
+        className="pixel-input"
       />
-      <button type="submit" className="pixel-btn w-full">
+      <button type="submit" className="pixel-btn">
         Add Game
       </button>
     </form>
