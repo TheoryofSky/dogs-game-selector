@@ -1,5 +1,3 @@
-'use client'
-
 import { useState } from 'react'
 
 interface AddGameTitleProps {
@@ -23,17 +21,18 @@ export default function AddGameTitle({ onAddGame }: AddGameTitleProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-2">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <input
         type="text"
         value={gameTitle}
         onChange={(e) => setGameTitle(e.target.value)}
         placeholder="Enter game title"
-        className="pixel-input"
+        className="pixel-input w-full"
       />
-      <button type="submit" className="pixel-btn">
+      <button type="submit" className="pixel-btn w-full">
         Add Game
       </button>
     </form>
   )
 }
+
