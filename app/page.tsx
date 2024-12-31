@@ -16,6 +16,7 @@ export default function Home() {
   const [players, setPlayers] = useState<string[]>([])
   const [games, setGames] = useState<string[]>([])
   const [error, setError] = useState<string | null>(null)
+  const [currentPlayer, setCurrentPlayer] = useState<string>('')
 
   useEffect(() => {
     const pusherKey = process.env.NEXT_PUBLIC_PUSHER_KEY
@@ -50,6 +51,10 @@ export default function Home() {
         setGamePhase(data.phase)
       })
 
+      channel.bind('current-player', (data: { player: string }) => {
+        setCurrentPlayer(data.player)
+      })
+
       return () => {
         pusher.unsubscribe('dogs-game')
       }
@@ -76,22 +81,34 @@ export default function Home() {
   const renderCurrentPhase = () => {
     switch (gamePhase) {
       case 'waiting':
-        return <WaitingRoom players={players} onStart={() => changeGamePhase('submitting')} />
+        return (
+          <>
+            <WaitingRoom players={players} onStart={() => changeGamePhase('submitting')} />
+            <HowTo />
+          </>
+        )
       case 'submitting':
         return (
           <>
-            <AddGameTitle onAddGame={(game) => setGames([...games, game])} />
+            <AddGameTitle 
+              onAddGame={(game) => setGames([...games, game])} 
+              currentPlayer={currentPlayer}
+              totalGames={games.length}
+              maxGames={4}
+            />
             <GameList games={games} />
-            <button onClick={() => changeGamePhase('vetoing')} className="pixel-btn mt-4">
-              Move to Veto Round
-            </button>
+            {games.length === 4 && (
+              <button onClick={() => changeGamePhase('vetoing')} className="pixel-btn mt-4 w-full">
+                Move to Veto Round
+              </button>
+            )}
           </>
         )
       case 'vetoing':
         return (
           <>
             <VetoRound games={games} onVeto={(game) => setGames(games.filter((g) => g !== game))} />
-            <button onClick={() => changeGamePhase('voting')} className="pixel-btn mt-4">
+            <button onClick={() => changeGamePhase('voting')} className="pixel-btn mt-4 w-full">
               Move to Final Voting
             </button>
           </>
@@ -105,21 +122,24 @@ export default function Home() {
 
   if (error) {
     return (
-      <main className="flex min-h-screen flex-col items-center justify-center p-24">
-        <h1 className="text-4xl font-bold mb-8">D.O.G.S</h1>
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-          <strong className="font-bold">Error: </strong>
-          <span className="block sm:inline">{error}</span>
+      <main className="flex min-h-screen flex-col items-center justify-center p-4 pixel-bg">
+        <div className="pixel-card w-full max-w-md">
+          <h1 className="pixel-title">D.O.G.S</h1>
+          <div className="bg-accent bg-opacity-20 border border-accent text-white px-4 py-3 rounded relative" role="alert">
+            <strong className="font-bold">Error: </strong>
+            <span className="block sm:inline">{error}</span>
+          </div>
         </div>
       </main>
     )
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
-      <h1 className="text-4xl font-bold mb-8">D.O.G.S</h1>
-      <HowTo />
-      {renderCurrentPhase()}
+    <main className="flex min-h-screen flex-col items-center justify-center p-4 pixel-bg">
+      <div className="pixel-card w-full max-w-2xl">
+        <h1 className="pixel-title">D.O.G.S</h1>
+        {renderCurrentPhase()}
+      </div>
     </main>
   )
 }
