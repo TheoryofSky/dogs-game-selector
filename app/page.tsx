@@ -22,6 +22,7 @@ export default function Home() {
     const pusherCluster = process.env.NEXT_PUBLIC_PUSHER_CLUSTER
 
     if (!pusherKey || !pusherCluster) {
+      console.error('Pusher configuration is missing. Key:', pusherKey, 'Cluster:', pusherCluster)
       setError('Pusher configuration is missing. Please check your environment variables.')
       return
     }
@@ -53,8 +54,8 @@ export default function Home() {
         pusher.unsubscribe('dogs-game')
       }
     } catch (err) {
-      setError('Failed to initialize Pusher. Please try again later.')
       console.error('Pusher initialization error:', err)
+      setError('Failed to initialize Pusher. Please try again later.')
     }
   }, [])
 
